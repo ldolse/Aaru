@@ -47,7 +47,6 @@ using Aaru.Logging;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Sentry;
-using Device = Aaru.Devices.Device;
 using MediaType = Aaru.CommonTypes.MediaType;
 using OperatingSystem = Aaru.Database.Models.OperatingSystem;
 using Version = Aaru.Database.Models.Version;
@@ -556,48 +555,7 @@ public static class Statistics
         }
     }
 
-    /// <summary>Adds a new device to statistics</summary>
-    /// <param name="dev">Device</param>
-    public static void AddDevice(Device dev)
-    {
-        if(Settings.Settings.Current.Stats is not { DeviceStats: true }) return;
 
-        string deviceBus;
-
-        if(dev.IsUsb)
-            deviceBus = "USB";
-        else if(dev.IsFireWire)
-            deviceBus = "FireWire";
-        else
-            deviceBus = dev.Type.ToString();
-
-        using var ctx = AaruContext.Create(Settings.Settings.LocalDbPath);
-
-        if(ctx.SeenDevices.Any(d => d.Manufacturer == dev.Manufacturer     &&
-                                    d.Model        == dev.Model            &&
-                                    d.Revision     == dev.FirmwareRevision &&
-                                    d.Bus          == deviceBus))
-            return;
-
-        ctx.SeenDevices.Add(new DeviceStat
-        {
-            Bus          = deviceBus,
-            Manufacturer = dev.Manufacturer,
-            Model        = dev.Model,
-            Revision     = dev.FirmwareRevision,
-            Synchronized = false
-        });
-
-        try
-        {
-            ctx.SaveChanges();
-        }
-        catch(SqliteException ex)
-        {
-            AaruLogging.Debug(MODULE_NAME, Localization.Core.Exception_while_trying_to_save_statistics);
-            AaruLogging.Exception(ex, Localization.Core.Exception_while_trying_to_save_statistics);
-        }
-    }
 
     /// <summary>Adds a new media type to statistics</summary>
     /// <param name="type">Media type</param>

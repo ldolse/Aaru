@@ -352,10 +352,6 @@ class MainClass
                       .WithAlias("ln")
                       .WithDescription(UI.List_Namespaces_Command_Description);
 
-                config.AddCommand<RemoteCommand>("remote")
-                      .WithAlias("rem")
-                      .WithDescription(UI.Remote_Command_Description);
-
                 config.AddCommand<MetadataSchemaCommand>("metadata-schema")
                       .WithDescription(UI.Generates_the_JSON_schema_for_Aaru_metadata_files);
 
