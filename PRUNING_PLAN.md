@@ -417,7 +417,7 @@ dotnet run -- formats
 
 ## Session Notes
 
-**Session Date:** 2026-04-05  
+**Session Date:** 2026-04-06  
 **Branch:** `feature/optical-media-pruning`
 
 ### User Decisions Made:
@@ -435,14 +435,14 @@ This document serves as the primary reference for continuing the pruning work ac
 ## TODO Tracking
 
 - [x] Phase 1: Create baseline branch
-- [ ] Phase 2: Remove safe projects (Gui, Tui, Tests, Archives)
-- [ ] Phase 3: Remove Devices project
-- [ ] Phase 4: Prune image formats
-- [ ] Phase 5: Strip CLI commands
-- [ ] Phase 6: Audit Filters
-- [ ] Phase 7: Cleanup and verify build
+- [x] Phase 2: Remove safe projects (Gui, Tui, Tests, Archives)
+- [x] Phase 3: Remove Devices project
+- [x] Phase 4: Prune image formats
+- [x] Phase 5: Strip CLI commands
+- [x] Phase 6: Audit Filters
+- [x] Phase 7: Cleanup and verify build
 - [ ] Phase 8: Python translation documentation
 
 ---
 
-*Last updated: 2026-04-05*
+*Last updated: 2026-04-06*
