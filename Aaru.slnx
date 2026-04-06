@@ -48,7 +48,6 @@
   <Folder Name="/Solution Items/pkg/pacman/stable/">
     <File Path="pkg/pacman/stable/PKGBUILD"/>
   </Folder>
-  <Project Path="Aaru.Archives/Aaru.Archives.csproj"/>
   <Project Path="Aaru.Checksums/Aaru.Checksums.csproj"/>
   <Project Path="Aaru.CommonTypes/Aaru.CommonTypes.csproj"/>
   <Project Path="Aaru.Compression/Aaru.Compression.csproj"/>
@@ -56,23 +55,15 @@
   <Project Path="Aaru.Database/Aaru.Database.csproj"/>
   <Project Path="Aaru.Decoders/Aaru.Decoders.csproj"/>
   <Project Path="Aaru.Decryption/Aaru.Decryption.csproj"/>
-  <Project Path="Aaru.Devices/Aaru.Devices.csproj"/>
   <Project Path="Aaru.Dto/Aaru.Dto.csproj"/>
   <Project Path="Aaru.Filesystems/Aaru.Filesystems.csproj"/>
   <Project Path="Aaru.Filters/Aaru.Filters.csproj"/>
   <Project Path="Aaru.Generators/Aaru.Generators.csproj"/>
-  <Project Path="Aaru.Gui/Aaru.Gui.csproj"/>
   <Project Path="Aaru.Helpers/Aaru.Helpers.csproj"/>
   <Project Path="Aaru.Images/Aaru.Images.csproj"/>
   <Project Path="Aaru.Localization/Aaru.Localization.csproj"/>
   <Project Path="Aaru.Logging/Aaru.Logging.csproj"/>
   <Project Path="Aaru.Partitions/Aaru.Partitions.csproj"/>
   <Project Path="Aaru.Settings/Aaru.Settings.csproj"/>
-  <Project Path="Aaru.Tests.Devices/Aaru.Tests.Devices.csproj"/>
-  <Project Path="Aaru.Tests/Aaru.Tests.csproj"/>
-  <Project Path="Aaru.Tui\Aaru.Tui.csproj" Type="Classic C#">
-    <Configuration Solution="Debug|x86" Project="Debug|Any CPU"/>
-    <Configuration Solution="Release|x86" Project="Release|Any CPU"/>
-  </Project>
   <Project Path="Aaru/Aaru.csproj"/>
 </Solution>

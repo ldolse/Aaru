@@ -50,8 +50,7 @@ public static class PluginBase
             new Filters.Register(),
             new Images.Register(),
             new Aaru.Filesystems.Register(),
-            new Aaru.Partitions.Register(),
-            new Archives.Register()
+            new Aaru.Partitions.Register()
         });
     }
 }

@@ -38,19 +38,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Aaru.Commands;
-using Aaru.Commands.Archive;
-using Aaru.Commands.Database;
-using Aaru.Commands.Device;
 using Aaru.Commands.Filesystem;
 using Aaru.Commands.Image;
-using Aaru.Commands.Media;
 using Aaru.CommonTypes.Enums;
 using Aaru.Core;
 using Aaru.Database;
 using Aaru.Localization;
 using Aaru.Logging;
 using Aaru.Settings;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Sentry;
 using Serilog;
@@ -67,7 +62,7 @@ class MainClass
     static        AssemblyInformationalVersionAttribute _assemblyVersion;
     public static bool                                  PauseBeforeExiting { get; set; }
 
-    public static async Task<int> Main([NotNull] string[] args)
+    public static async Task<int> Main(string[] args)
     {
         object[] attributes = typeof(MainClass).Assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
         _assemblyTitle = ((AssemblyTitleAttribute)attributes[0]).Title;
@@ -78,9 +73,6 @@ class MainClass
                 AssemblyInformationalVersionAttribute;
 
         _assemblyCopyright = ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
-
-        if(args.Length == 1 && args[0].Equals("gui", StringComparison.InvariantCultureIgnoreCase))
-            return Gui.Main.Start(args);
 
         SentrySdk.Init(static options =>
         {
@@ -243,37 +235,7 @@ class MainClass
 
             await ctx.SaveChangesAsync();
 
-            var mainDbUpdate = false;
 
-            if(!File.Exists(Settings.Settings.MainDbPath))
-            {
-                mainDbUpdate = true;
-                await UpdateCommand.DoUpdateAsync(true);
-            }
-
-            var mainContext = AaruContext.Create(Settings.Settings.MainDbPath, false);
-
-            if((await mainContext.Database.GetPendingMigrationsAsync()).Any())
-            {
-                AaruLogging.WriteLine(UI.New_database_version_updating);
-
-                try
-                {
-                    File.Delete(Settings.Settings.MainDbPath);
-                }
-                catch(Exception ex)
-                {
-                    SentrySdk.CaptureException(ex);
-                    AaruLogging.Error(UI.Exception_trying_to_remove_old_database_version);
-                    AaruLogging.Error(UI.Please_manually_remove_file_at_0, Settings.Settings.MainDbPath);
-
-                    return (int)ErrorNumber.CannotRemoveDatabase;
-                }
-
-                await mainContext.Database.CloseConnectionAsync();
-                await mainContext.DisposeAsync();
-                await UpdateCommand.DoUpdateAsync(true);
-            }
 
             // GDPR level compliance does not match and there are no arguments or the arguments are neither GUI neither configure.
             if(Settings.Settings.Current.GdprCompliance < DicSettings.GDPR_LEVEL &&
@@ -297,45 +259,6 @@ class MainClass
                 config.PropagateExceptions();
 
                 config.UseAssemblyInformationalVersion();
-
-                config.AddBranch<ArchiveFamily>("archive",
-                                                static archive =>
-                                                {
-                                                    archive.SetDescription(UI.Archive_Command_Family_Description);
-
-                                                    archive.AddCommand<ArchiveListCommand>("list")
-                                                           .WithAlias("l")
-                                                           .WithAlias("ls")
-                                                           .WithDescription(UI.Archive_List_Command_Description);
-
-                                                    archive.AddCommand<ArchiveExtractCommand>("extract")
-                                                           .WithAlias("x")
-                                                           .WithDescription(UI.Archive_Extract_Command_Description);
-
-                                                    archive.AddCommand<ArchiveInfoCommand>("info")
-                                                           .WithAlias("i")
-                                                           .WithDescription(UI.Archive_Info_Command_Description);
-                                                })
-                      .WithAlias("arc");
-
-                config.AddBranch<DeviceFamily>("device",
-                                               static device =>
-                                               {
-                                                   device.SetDescription(UI.Device_Command_Family_Description);
-
-                                                   device.AddCommand<DeviceReportCommand>("report")
-                                                         .WithDescription(UI.Device_Report_Command_Description);
-
-                                                   device.AddCommand<DeviceInfoCommand>("info")
-                                                         .WithAlias("i")
-                                                         .WithDescription(UI.Device_Info_Command_Description);
-
-                                                   device.AddCommand<ListDevicesCommand>("list")
-                                                         .WithAlias("l")
-                                                         .WithAlias("ls")
-                                                         .WithDescription(UI.Device_List_Command_Description);
-                                               })
-                      .WithAlias("dev");
 
                 config.AddBranch<FilesystemFamily>("filesystem",
                                                    static fs =>
@@ -411,37 +334,7 @@ class MainClass
                       .WithAlias("i")
                       .WithAlias("img");
 
-                config.AddBranch<MediaFamily>("media",
-                                              static media =>
-                                              {
-                                                  media.SetDescription(UI.Media_Command_Family_Description);
 
-                                                  media.AddCommand<MediaInfoCommand>("info")
-                                                       .WithAlias("i")
-                                                       .WithDescription(UI.Media_Info_Command_Description);
-
-                                                  media.AddCommand<MediaScanCommand>("scan")
-                                                       .WithAlias("s")
-                                                       .WithDescription(UI.Media_Scan_Command_Description);
-
-                                                  media.AddCommand<DumpMediaCommand>("dump")
-                                                       .WithAlias("d")
-                                                       .WithDescription(UI.Media_Dump_Command_Description);
-                                              })
-                      .WithAlias("m");
-
-                config.AddBranch<DatabaseFamily>("database",
-                                                 static db =>
-                                                 {
-                                                     db.SetDescription(UI.Database_Command_Family_Description);
-
-                                                     db.AddCommand<StatisticsCommand>("stats")
-                                                       .WithDescription(UI.Database_Stats_Command_Description);
-
-                                                     db.AddCommand<UpdateCommand>("update")
-                                                       .WithDescription(UI.Database_Update_Command_Description);
-                                                 })
-                      .WithAlias("db");
 
                 config.AddCommand<ConfigureCommand>("configure")
                       .WithAlias("cfg")

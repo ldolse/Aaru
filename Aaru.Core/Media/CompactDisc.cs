@@ -36,7 +36,6 @@ using Aaru.CommonTypes.Interfaces;
 using Aaru.CommonTypes.Structs;
 using Aaru.Core.Logging;
 using Aaru.Decoders.CD;
-using Aaru.Devices;
 using Aaru.Helpers;
 using Aaru.Logging;
 

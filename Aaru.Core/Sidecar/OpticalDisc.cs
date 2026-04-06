@@ -43,7 +43,6 @@ using Aaru.Decoders.CD;
 using Aaru.Decoders.DVD;
 using Sentry;
 using DMI = Aaru.Decoders.Xbox.DMI;
-using Dump = Aaru.Core.Devices.Dumping.Dump;
 using Partition = Aaru.CommonTypes.Partition;
 using Session = Aaru.CommonTypes.Structs.Session;
 using Track = Aaru.CommonTypes.Structs.Track;
@@ -111,8 +110,6 @@ public sealed partial class Sidecar
             errno = image.ReadMediaTag(tagType, out byte[] tag);
 
             if(errno != ErrorNumber.NoError) continue;
-
-            Dump.AddMediaTagToSidecar(imagePath, tagType, tag, ref sidecar);
 
             switch(tagType)
             {

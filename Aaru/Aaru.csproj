@@ -42,7 +42,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Aaru.Checksums\Aaru.Checksums.csproj"/>
     <ProjectReference Include="..\Aaru.Database\Aaru.Database.csproj"/>
-    <ProjectReference Include="..\Aaru.Gui\Aaru.Gui.csproj"/>
     <ProjectReference Include="..\Aaru.Helpers\Aaru.Helpers.csproj"/>
     <ProjectReference Include="..\Aaru.Images\Aaru.Images.csproj"/>
     <ProjectReference Include="..\Aaru.CommonTypes\Aaru.CommonTypes.csproj"/>
@@ -50,7 +49,6 @@
     <ProjectReference Include="..\Aaru.Partitions\Aaru.Partitions.csproj"/>
     <ProjectReference Include="..\Aaru.Filesystems\Aaru.Filesystems.csproj"/>
     <ProjectReference Include="..\Aaru.Decoders\Aaru.Decoders.csproj"/>
-    <ProjectReference Include="..\Aaru.Devices\Aaru.Devices.csproj"/>
     <ProjectReference Include="..\Aaru.Logging\Aaru.Logging.csproj"/>
     <ProjectReference Include="..\Aaru.Settings\Aaru.Settings.csproj"/>
     <ProjectReference Include="..\Aaru.Filters\Aaru.Filters.csproj"/>
@@ -78,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Humanizer"/>
+    <PackageReference Include="JetBrains.Annotations"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

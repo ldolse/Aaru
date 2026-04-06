@@ -7,7 +7,6 @@ using Aaru.CommonTypes.Interfaces;
 using Aaru.CommonTypes.Structs;
 using Aaru.Core.Media;
 using Aaru.Decryption.DVD;
-using Aaru.Devices;
 using Aaru.Localization;
 using Aaru.Logging;
 
