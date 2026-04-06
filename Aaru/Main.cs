@@ -302,6 +302,25 @@ class MainClass
 
                                                   image.AddCommand<MergeCommand>("merge")
                                                        .WithDescription(UI.Image_Merge_Command_Description);
+
+                                                  image.AddCommand<CompareCommand>("compare")
+                                                       .WithDescription(UI.Image_Compare_Command_Description);
+
+                                                  image.AddCommand<ChecksumCommand>("checksum")
+                                                       .WithDescription(UI.Image_Checksum_Command_Description);
+
+                                                  image.AddCommand<PrintHexCommand>("print-hex")
+                                                       .WithAlias("ph")
+                                                       .WithDescription(UI.Image_Print_Command_Description);
+
+                                                  image.AddCommand<DecodeCommand>("decode")
+                                                       .WithDescription(UI.Image_Decode_Command_Description);
+
+                                                  image.AddCommand<EntropyCommand>("entropy")
+                                                       .WithDescription(UI.Image_Entropy_Command_Description);
+
+                                                  image.AddCommand<CreateSidecarCommand>("create-sidecar")
+                                                       .WithDescription(UI.Image_Create_Sidecar_Command_Description);
                                               })
                   .WithAlias("i")
                   .WithAlias("img");
