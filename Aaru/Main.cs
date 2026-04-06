@@ -288,38 +288,13 @@ class MainClass
                                               {
                                                   image.SetDescription(UI.Image_Command_Family_Description);
 
-                                                  image.AddCommand<ChecksumCommand>("checksum")
-                                                       .WithAlias("chk")
-                                                       .WithDescription(UI.Image_Checksum_Command_Description);
-
-                                                  image.AddCommand<CompareCommand>("compare")
-                                                       .WithAlias("cmp")
-                                                       .WithDescription(UI.Image_Compare_Command_Description);
-
                                                   image.AddCommand<ConvertImageCommand>("convert")
                                                        .WithAlias("cvt")
                                                        .WithDescription(UI.Image_Convert_Command_Description);
 
-                                                  image.AddCommand<CreateSidecarCommand>("create-sidecar")
-                                                       .WithAlias("cs")
-                                                       .WithDescription(UI.Image_Create_Sidecar_Command_Description);
-
-                                                  image.AddCommand<DecodeCommand>("decode")
-                                                       .WithDescription(UI.Image_Decode_Command_Description);
-
-                                                  image.AddCommand<EntropyCommand>("entropy")
-                                                       .WithDescription(UI.Image_Entropy_Command_Description);
-
                                                   image.AddCommand<ImageInfoCommand>("info")
                                                        .WithAlias("i")
                                                        .WithDescription(UI.Image_Info_Command_Description);
-
-                                                  image.AddCommand<Commands.Image.ListOptionsCommand>("options")
-                                                       .WithDescription(UI.Image_Options_Command_Description);
-
-                                                  image.AddCommand<PrintHexCommand>("print-hex")
-                                                       .WithAlias("ph")
-                                                       .WithDescription(UI.Image_Print_Command_Description);
 
                                                   image.AddCommand<VerifyCommand>("verify")
                                                        .WithAlias("v")
@@ -327,12 +302,9 @@ class MainClass
 
                                                   image.AddCommand<MergeCommand>("merge")
                                                        .WithDescription(UI.Image_Merge_Command_Description);
-
-                                                  image.AddCommand<WriteMetadataCommand>("write-metadata")
-                                                       .WithDescription(UI.Image_Write_Metadata_Command_Description);
                                               })
-                      .WithAlias("i")
-                      .WithAlias("img");
+                  .WithAlias("i")
+                  .WithAlias("img");
 
 
 
