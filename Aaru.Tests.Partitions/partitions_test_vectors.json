@@ -1,0 +1,10 @@
+{
+  "partition_detection": [
+    {
+      "name": "partition_detection_note",
+      "input_hex": "",
+      "expected_hex": "",
+      "description": "Partition detection requires real disk images with known partition tables. Use integration tests with actual disk images containing MBR, GPT, etc."
+    }
+  ]
+}

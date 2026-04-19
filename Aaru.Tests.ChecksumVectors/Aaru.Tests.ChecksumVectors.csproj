@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Aaru.Tests.ChecksumVectors</RootNamespace>
+    <AssemblyName>Aaru.Tests.ChecksumVectors</AssemblyName>
+    <Title>Checksum Test Vector Generator</Title>
+    <Description>Generates test vectors for verifying Python checksum implementations against C# reference.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aaru.Checksums\Aaru.Checksums.csproj"/>
+    <ProjectReference Include="..\Aaru.CommonTypes\Aaru.CommonTypes.csproj"/>
+    <ProjectReference Include="..\Aaru.Helpers\Aaru.Helpers.csproj"/>
+    <ProjectReference Include="..\Aaru.Logging\Aaru.Logging.csproj"/>
+    <ProjectReference Include="..\Aaru.Localization\Aaru.Localization.csproj"/>
+  </ItemGroup>
+</Project>

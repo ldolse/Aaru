@@ -1,0 +1,25 @@
+<!--
+  Aaru.Tests.Filters - Test Vector Generator for Filter Functions
+  
+  This project generates test vectors for filter functions.
+  Run with: dotnet run
+  
+  Output: filter_test_vectors.json
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Aaru.Tests.Filters</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aaru.Filters\Aaru.Filters.csproj" />
+    <ProjectReference Include="..\Aaru.CommonTypes\Aaru.CommonTypes.csproj" />
+    <ProjectReference Include="..\Aaru.Checksums\Aaru.Checksums.csproj" />
+  </ItemGroup>
+
+</Project>

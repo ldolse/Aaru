@@ -1,0 +1,26 @@
+<!--
+  Aaru.Tests.ImageFormats - Test Vector Generator for Image Format Readers
+  
+  This project generates test vectors for image format reader functions.
+  Run with: dotnet run
+  
+  Output: image_format_test_vectors.json
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Aaru.Tests.ImageFormats</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference Aaru image format libraries -->
+    <ProjectReference Include="..\Aaru.Images\Aaru.Images.csproj" />
+    <ProjectReference Include="..\Aaru.CommonTypes\Aaru.CommonTypes.csproj" />
+    <ProjectReference Include="..\Aaru.Filters\Aaru.Filters.csproj" />
+  </ItemGroup>
+
+</Project>

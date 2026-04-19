@@ -1,0 +1,25 @@
+<!--
+  Aaru.Tests.Decoders - Test Vector Generator for CD Decoders
+  
+  This project generates test vectors for CD decoder functions.
+  Run with: dotnet run
+  
+  Output: decoder_test_vectors.json
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Aaru.Tests.Decoders</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference Aaru decoder libraries -->
+    <ProjectReference Include="..\Aaru.Decoders\Aaru.Decoders.csproj" />
+    <ProjectReference Include="..\Aaru.CommonTypes\Aaru.CommonTypes.csproj" />
+  </ItemGroup>
+
+</Project>

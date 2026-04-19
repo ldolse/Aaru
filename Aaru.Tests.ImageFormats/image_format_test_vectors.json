@@ -1,0 +1,55 @@
+{
+  "clone_cd_identify": [
+    {
+      "name": "valid_clone_cd_header",
+      "input_hex": "5b436c6f6e6543445d0a56657273696f6e3d330a",
+      "expected_hex": "true",
+      "actual_hex": "true",
+      "description": "Identify test: valid_clone_cd_header (called C# CloneCd.Identify)"
+    },
+    {
+      "name": "invalid_header",
+      "input_hex": "5b496e76616c69645d0a56657273696f6e3d310a",
+      "expected_hex": "false",
+      "actual_hex": "false",
+      "description": "Identify test: invalid_header (called C# CloneCd.Identify)"
+    },
+    {
+      "name": "empty_file",
+      "input_hex": "",
+      "expected_hex": "false",
+      "actual_hex": "false",
+      "description": "Identify test: empty_file (called C# CloneCd.Identify)"
+    }
+  ],
+  "lba_calculations": [
+    {
+      "name": "lba_0_2_0",
+      "input_hex": "000200",
+      "expected_hex": "00000000",
+      "actual_hex": null,
+      "description": "LBA calculation for 0:02:00"
+    },
+    {
+      "name": "lba_0_3_0",
+      "input_hex": "000300",
+      "expected_hex": "0000004b",
+      "actual_hex": null,
+      "description": "LBA calculation for 0:03:00"
+    },
+    {
+      "name": "lba_1_0_0",
+      "input_hex": "010000",
+      "expected_hex": "000010fe",
+      "actual_hex": null,
+      "description": "LBA calculation for 1:00:00"
+    },
+    {
+      "name": "lba_10_30_45",
+      "input_hex": "0a1e2d",
+      "expected_hex": "0000b829",
+      "actual_hex": null,
+      "description": "LBA calculation for 10:30:45"
+    }
+  ]
+}

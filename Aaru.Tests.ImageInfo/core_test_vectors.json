@@ -1,0 +1,10 @@
+{
+  "placeholder": [
+    {
+      "name": "core_conversion_note",
+      "input_hex": "",
+      "expected_hex": "",
+      "description": "Core conversion testing requires integration tests with real images. Use existing image format tests for now."
+    }
+  ]
+}

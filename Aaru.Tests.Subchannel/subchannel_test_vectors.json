@@ -1,0 +1,64 @@
+{
+  "bcd_conversion": [
+    {
+      "name": "bcd_0x00_to_byte",
+      "input_hex": "00",
+      "expected_hex": "00",
+      "description": "BCD 0x00 to byte 0"
+    },
+    {
+      "name": "bcd_0x09_to_byte",
+      "input_hex": "09",
+      "expected_hex": "09",
+      "description": "BCD 0x09 to byte 9"
+    },
+    {
+      "name": "bcd_0x10_to_byte",
+      "input_hex": "10",
+      "expected_hex": "0a",
+      "description": "BCD 0x10 to byte 10"
+    },
+    {
+      "name": "bcd_0x59_to_byte",
+      "input_hex": "59",
+      "expected_hex": "3b",
+      "description": "BCD 0x59 to byte 59"
+    },
+    {
+      "name": "bcd_0x99_to_byte",
+      "input_hex": "99",
+      "expected_hex": "63",
+      "description": "BCD 0x99 to byte 99"
+    },
+    {
+      "name": "byte_0_to_bcd",
+      "input_hex": "00",
+      "expected_hex": "00",
+      "description": "Byte 0 to BCD 0x00"
+    },
+    {
+      "name": "byte_9_to_bcd",
+      "input_hex": "09",
+      "expected_hex": "09",
+      "description": "Byte 9 to BCD 0x09"
+    },
+    {
+      "name": "byte_10_to_bcd",
+      "input_hex": "0a",
+      "expected_hex": "10",
+      "description": "Byte 10 to BCD 0x10"
+    },
+    {
+      "name": "byte_59_to_bcd",
+      "input_hex": "3b",
+      "expected_hex": "59",
+      "description": "Byte 59 to BCD 0x59"
+    },
+    {
+      "name": "byte_99_to_bcd",
+      "input_hex": "63",
+      "expected_hex": "99",
+      "description": "Byte 99 to BCD 0x99"
+    }
+  ]
+}

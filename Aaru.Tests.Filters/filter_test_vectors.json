@@ -1,0 +1,16 @@
+{
+  "filter_identify": [
+    {
+      "name": "gzip_identify_valid",
+      "input_hex": "1f8b0800000000000003",
+      "expected_hex": "true",
+      "description": "GZip filter identifies valid gzip header"
+    },
+    {
+      "name": "gzip_identify_invalid",
+      "input_hex": "00010203",
+      "expected_hex": "false",
+      "description": "GZip filter rejects non-gzip data"
+    }
+  ]
+}

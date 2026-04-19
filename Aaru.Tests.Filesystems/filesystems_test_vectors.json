@@ -1,0 +1,10 @@
+{
+  "filesystem_identify": [
+    {
+      "name": "filesystem_identification_note",
+      "input_hex": "",
+      "expected_hex": "",
+      "description": "Filesystem identification requires real image files with known filesystems. Use integration tests with actual CD/DVD images containing ISO9660, UDF, etc."
+    }
+  ]
+}
