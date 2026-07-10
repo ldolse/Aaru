@@ -353,13 +353,15 @@ public sealed partial class Cdrdao
                                       lineNumber,
                                       matchIndex.Groups["address"].Value);
 
-                    string[] lengthString = matchFile.Groups["length"].Value.Split(':');
+                    string[] addressString = matchIndex.Groups["address"].Value.Split(':');
 
-                    ulong nextIndexPos = ulong.Parse(lengthString[0]) * 60 * 75 +
-                                         ulong.Parse(lengthString[1]) * 75      +
-                                         ulong.Parse(lengthString[2]);
+                    ulong nextIndexPos = ulong.Parse(addressString[0]) * 60 * 75 +
+                                         ulong.Parse(addressString[1]) * 75      +
+                                         ulong.Parse(addressString[2]);
 
                     currentTrack.Indexes.Add(nextIndex, nextIndexPos + currentTrack.Pregap + currentTrack.StartSector);
+
+                    nextIndex++;
                 }
                 else if(matchPregap.Success)
                 {
