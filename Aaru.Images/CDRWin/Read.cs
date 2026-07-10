@@ -1418,8 +1418,23 @@ public sealed partial class CdrWin
                 partition.Description = string.Format(Localization.Track_0, _discImage.Tracks[i].Sequence);
                 partition.Name        = _discImage.Tracks[i].Title;
                 partition.Start       = (ulong)_discImage.Tracks[i].Indexes[1];
-                partition.Size        = _discImage.Tracks[i].Sectors * _discImage.Tracks[i].Bps;
-                partition.Length      = _discImage.Tracks[i].Sectors;
+
+                // Adjust partition length to not exceed the track's end sector.
+                ulong trackStartSector = 0;
+
+                if(_discImage.Tracks[i].Indexes.TryGetValue(0, out int trackIdx0))
+                    trackStartSector = trackIdx0 > 0 ? (ulong)trackIdx0 : 0;
+                else if(_discImage.Tracks[i].Indexes.TryGetValue(1, out int trackIdx1))
+                    trackStartSector = (ulong)trackIdx1;
+
+                ulong trackEndSector = trackStartSector + _discImage.Tracks[i].Sectors - 1;
+                ulong partitionLength = trackEndSector - partition.Start + 1;
+
+                if((long)partitionLength < 1)
+                    partitionLength = _discImage.Tracks[i].Sectors;
+
+                partition.Size        = partitionLength * _discImage.Tracks[i].Bps;
+                partition.Length      = partitionLength;
                 partition.Sequence    = partitionSequence;
                 partition.Offset      = partition.Start * 2352;
                 partition.Type        = _discImage.Tracks[i].TrackType;
