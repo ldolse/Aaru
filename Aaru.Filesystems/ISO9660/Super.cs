@@ -734,6 +734,10 @@ public sealed partial class ISO9660
         Metadata.Clusters    =  decodedVd.Blocks;
         Metadata.ClusterSize =  decodedVd.BlockSize;
 
+        if(!string.IsNullOrEmpty(decodedVd.SystemIdentifier) &&
+           decodedVd.SystemIdentifier.ToUpperInvariant().Contains("PLAYSTATION"))
+            _isPlayStation = true;
+
         _statfs = new FileSystemInfo
         {
             Blocks         = decodedVd.Blocks,

@@ -215,20 +215,23 @@ public sealed partial class Sidecar
 
             if(error == ErrorNumber.NoError)
             {
-                data = new byte[1048576];
-
                 while(position < stat.Length - 1048576)
                 {
                     if(_aborted) return file;
 
+                    data = new byte[1048576];
+
                     // TODO: Better error handling
-                    filesystem.ReadFile(fileNode, 1048576, data, out _);
+                    filesystem.ReadFile(fileNode, 1048576, data, out long bytesRead);
 
                     UpdateProgress2(Localization.Core.Hashing_file_byte_0_of_1, position, stat.Length);
 
-                    fileChkWorker.Update(data);
+                    if(bytesRead == 1048576)
+                        fileChkWorker.Update(data);
+                    else
+                        fileChkWorker.Update(data[..(int)bytesRead]);
 
-                    position += 1048576;
+                    position += bytesRead;
                 }
 
                 data = new byte[stat.Length - position];

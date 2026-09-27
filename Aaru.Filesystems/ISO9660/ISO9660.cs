@@ -50,6 +50,7 @@ public sealed partial class ISO9660 : IReadOnlyFilesystem
     Encoding                                  _encoding;
     bool                                      _highSierra;
     IMediaImage                               _image;
+    bool                                      _isPlayStation;
     bool                                      _joliet;
     bool                                      _mounted;
     Namespace                                 _namespace;

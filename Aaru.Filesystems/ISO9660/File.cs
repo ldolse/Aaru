@@ -114,29 +114,48 @@ public sealed partial class ISO9660
 
     // Cannot think how to make this faster, as we don't know the mode sector until it is read, but we have size in bytes
     ErrorNumber ReadWithExtents(long offset,     long size, List<(uint extent, uint size)> extents, bool interleaved,
-                                byte fileNumber, out byte[] buffer)
+                                byte fileNumber, out byte[] buffer, bool isRawInterleaved = false)
     {
         // Allocate the result once and copy each sector directly into its slice
         var  result      = new byte[size];
         long written     = 0;
         long extentStart = 0;
 
+        // Sector data size: 2352 for raw interleaved (PSX/Saturn XA Audio), 2048 otherwise
+        int sectorDataSize = isRawInterleaved ? 2352 : 2048;
+
         for(var i = 0; i < extents.Count; i++)
         {
-            if(extentStart + extents[i].size <= offset)
+            // Raw interleaved (PSX/Saturn XA Audio): extent size is logical (2048-based)
+            // but sector data is raw (2352B).  Convert so offsetInExtent matches.
+            long rawExtentSize = isRawInterleaved
+                                   ? extents[i].size / 2048 * sectorDataSize
+                                   : extents[i].size;
+
+            if(extentStart + rawExtentSize <= offset)
             {
-                extentStart += extents[i].size;
+                extentStart += rawExtentSize;
 
                 continue;
             }
 
-            long offsetInExtent      = offset > extentStart ? offset - extentStart : 0;
-            var  currentExtentSector = (uint)(offsetInExtent / 2048);
-            long leftExtentSize      = extents[i].size - currentExtentSector * 2048;
+            long offsetInExtent = offset > extentStart ? offset - extentStart : 0;
 
-            while(leftExtentSize > 0)
+            // Read sectors sequentially from extent start, tracking actual byte
+            // position.  This correctly handles raw interleaved sectors (2352B)
+            // that the 2048-based offset-to-sector mapping gets wrong on
+            // multi-chunk reads.  Use a sector counter with safety margin
+            // instead of leftExtentSize.
+            uint sectorIdx     = 0;
+            long bytePos       = 0;
+            long maxSectors    = isRawInterleaved
+                                    ? rawExtentSize / sectorDataSize + 16
+                                    : extents[i].size / 2048 + 16;
+            long sectorsScanned = 0;
+
+            while(sectorsScanned < maxSectors)
             {
-                ErrorNumber errno = ReadSector(extents[i].extent + currentExtentSector,
+                ErrorNumber errno = ReadSector(extents[i].extent + sectorIdx,
                                                out byte[] sector,
                                                interleaved,
                                                fileNumber);
@@ -150,23 +169,23 @@ public sealed partial class ISO9660
 
                 if(sector is null)
                 {
-                    currentExtentSector++;
-                    leftExtentSize -= 2048;
+                    sectorIdx++;
+                    sectorsScanned++;
 
                     continue;
                 }
 
-                long sectorStart = (long)currentExtentSector * 2048;
-
-                if(offsetInExtent > sectorStart + sector.Length)
+                // Skip sectors before the requested offset
+                if(bytePos + sector.Length <= offsetInExtent)
                 {
-                    currentExtentSector++;
-                    leftExtentSize -= sector.Length;
+                    bytePos        += sector.Length;
+                    sectorIdx++;
+                    sectorsScanned++;
 
                     continue;
                 }
 
-                int skip   = offsetInExtent > sectorStart ? (int)(offsetInExtent - sectorStart) : 0;
+                int skip   = offsetInExtent > bytePos ? (int)(offsetInExtent - bytePos) : 0;
                 var toCopy = (int)Math.Min(sector.Length - skip, size - written);
 
                 if(toCopy > 0)
@@ -175,17 +194,20 @@ public sealed partial class ISO9660
                     written += toCopy;
                 }
 
-                currentExtentSector++;
-                leftExtentSize -= sector.Length;
+                bytePos        += sector.Length;
+                sectorIdx++;
+                sectorsScanned++;
 
                 if(written >= size) break;
             }
 
-            extentStart += extents[i].size;
+            extentStart += rawExtentSize;
 
             if(written >= size) break;
         }
 
+        // Trim any excess from the safety margin in maxSectors.  size is already
+        // in the correct units (2352 for raw interleaved, 2048 otherwise).
         buffer = written == size ? result : result[..(int)written];
 
         return ErrorNumber.NoError;
@@ -236,10 +258,30 @@ public sealed partial class ISO9660
 
         if(entry.Extents is null) return ErrorNumber.InvalidArgument;
 
+        long fileLength = entry.Zisofs is not null ? entry.Zisofs.Value.uncomp_len : (long)entry.Size;
+
+        // PSX interleaved: report raw data size (2352B/sector) instead of logical (2048B/sector)
+        // Must match Stat() so callers can loop on stat.Length consistently
+        if(_isPlayStation && entry.XA?.signature == XA_MAGIC &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true)
+        {
+            fileLength = fileLength / 2048 * 2352;
+        }
+
+        // Standard interleaved XA audio (e.g. Saturn): report raw data size (2352B/sector)
+        // with subheader intact so external decoders have ADPCM coding parameters.
+        // Must match Stat() so callers can loop on stat.Length consistently.
+        if(!_isPlayStation && entry.XA?.signature == XA_MAGIC &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Mode2Form2) == true)
+        {
+            fileLength = fileLength / 2048 * 2352;
+        }
+
         node = new Iso9660FileNode
         {
             Path   = path,
-            Length = entry.Zisofs is not null ? entry.Zisofs.Value.uncomp_len : (long)entry.Size,
+            Length = fileLength,
             Offset = 0,
             Dentry = entry
         };
@@ -300,13 +342,45 @@ public sealed partial class ISO9660
         if(mynode.Dentry.CdiSystemArea?.attributes.HasFlag(CdiAttributes.DigitalAudio) != true ||
            mynode.Dentry.Extents.Count                                                 != 1)
         {
-            ErrorNumber err = ReadWithExtents(offset,
-                                              read,
+            bool interleaved = mynode.Dentry.XA?.signature == XA_MAGIC &&
+                               mynode.Dentry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true;
+
+            long adjustedRead = read;
+
+            // PSX interleaved: each sector yields 2352 raw bytes.  Compute adjustedRead
+            // in 2352-byte units so ReadWithExtents reads the correct amount.
+            // Standard interleaved XA audio (e.g. Saturn): same treatment — full raw
+            // sectors with subheader, but file number filtering is still applied in
+            // ReadSector (unlike PSX which ignores file numbers).
+            bool isForm2AudioInterleaved = !_isPlayStation && interleaved &&
+                                           mynode.Dentry.XA?.attributes.HasFlag(XaAttributes.Mode2Form2) == true;
+            bool isRawInterleaved        = (_isPlayStation || isForm2AudioInterleaved) && interleaved;
+
+            if(isRawInterleaved)
+            {
+                int maxRawSectors = Math.Max(1, buffer.Length / 2352);
+                long sectorsToRead = Math.Min((read + 2351) / 2352, (long)maxRawSectors);
+
+                if(sectorsToRead <= 0)
+                {
+                    read = 0;
+
+                    return ErrorNumber.NoError;
+                }
+
+                adjustedRead = sectorsToRead * 2352;
+            }
+
+            // ReadWithExtents handles raw extent_size conversion internally.
+            long readOffset = offset;
+
+            ErrorNumber err = ReadWithExtents(readOffset,
+                                              adjustedRead,
                                               mynode.Dentry.Extents,
-                                              mynode.Dentry.XA?.signature == XA_MAGIC &&
-                                              mynode.Dentry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true,
+                                              interleaved,
                                               mynode.Dentry.XA?.filenumber ?? 0,
-                                              out byte[] buf);
+                                              out byte[] buf,
+                                              isRawInterleaved);
 
             if(err != ErrorNumber.NoError)
             {
@@ -315,10 +389,11 @@ public sealed partial class ISO9660
                 return err;
             }
 
-            Array.Copy(buf, 0, buffer, 0, Math.Min(buf.Length, (int)read));
-            read = Math.Min(buf.Length, read);
-
-            node.Offset += read;
+            // ReadWithExtents truncates to adjustedRead, so buf.Length == adjustedRead.
+            long actualRead = Math.Min(buf.Length, adjustedRead);
+            Array.Copy(buf, 0, buffer, 0, actualRead);
+            read = actualRead;
+            node.Offset += actualRead;
 
             return ErrorNumber.NoError;
         }
@@ -374,6 +449,23 @@ public sealed partial class ISO9660
 
         // For zisofs compressed files, use the uncompressed size
         long fileLength = entry.Zisofs is not null ? entry.Zisofs.Value.uncomp_len : (long)entry.Size;
+
+        // PSX interleaved: report raw data size (2352B/sector) instead of logical (2048B/sector)
+        if(_isPlayStation && entry.XA?.signature == XA_MAGIC &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true)
+        {
+            fileLength = fileLength / 2048 * 2352;
+        }
+
+        // Standard interleaved XA audio (e.g. Saturn): report raw data size (2352B/sector)
+        // with subheader intact, same as PSX.  Extent size in the directory entry is
+        // 2048-based, but each raw sector yields 2352 bytes.
+        if(!_isPlayStation && entry.XA?.signature == XA_MAGIC &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Interleaved) == true &&
+           entry.XA?.attributes.HasFlag(XaAttributes.Mode2Form2) == true)
+        {
+            fileLength = fileLength / 2048 * 2352;
+        }
 
         stat = new FileEntryInfo
         {

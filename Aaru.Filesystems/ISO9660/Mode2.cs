@@ -135,6 +135,35 @@ public sealed partial class ISO9660
 
             if(_blockSize == 2048)
             {
+                // PSX interleaved: return full raw sector data (2352B) with subheader intact,
+                // without file number filtering (PSX broke the spec).
+                if(_isPlayStation && interleaved)
+                {
+                    buffer = data;
+
+                    return ErrorNumber.NoError;
+                }
+
+                // Standard interleaved XA audio: filter by file number like normal, but
+                // return full raw sector data (2352B) with subheader intact.  The subheader
+                // contains ADPCM coding parameters (ci byte: level B/C, stereo/mono) needed
+                // by external decoders.  Without it, tools get raw ADPCM data but no way to
+                // decode it.  Detect via per-sector Mode2Submode.Audio flag (0x04).
+                if(interleaved && data.Length == 2352 && data[15] == 0x02 &&
+                   ((Mode2Submode)data[18]).HasFlag(Mode2Submode.Audio))
+                {
+                    if(data[16] != fileNumber)
+                    {
+                        buffer = null;
+
+                        return ErrorNumber.NoError;
+                    }
+
+                    buffer = data;
+
+                    return ErrorNumber.NoError;
+                }
+
                 buffer = data.Length == 2064
                               ? Decoders.DVD.Sector.GetUserData(data)
                               : Sector.GetUserData(data, interleaved, fileNumber);
